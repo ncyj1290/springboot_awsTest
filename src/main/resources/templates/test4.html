@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div layout:fragment="Content">
+		<h1>test4d</h1>
+		
+		아이디 : <span th:text="${member.id}"></span><br>
+		비밀번호 : <span th:text="${member.password}"></span><br>
+		이름 : <span th:text="${member.name}"></span><br>
+		
+		
+		
+		<span th:each="l, s:${tempList}" >
+			<span th:text="${s.even}"></span>
+			<span th:text="${l}"></span>
+		</span>
+		
+	</div>
+</body>
+</html>

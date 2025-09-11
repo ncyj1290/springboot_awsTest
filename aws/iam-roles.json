@@ -1,0 +1,71 @@
+{
+  "ecsTaskExecutionRole": {
+    "roleName": "ecsTaskExecutionRole",
+    "assumeRolePolicyDocument": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Service": "ecs-tasks.amazonaws.com"
+          },
+          "Action": "sts:AssumeRole"
+        }
+      ]
+    },
+    "managedPolicies": [
+      "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+    ],
+    "inlinePolicy": {
+      "policyName": "SSMParameterAccess",
+      "policyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ssm:GetParameter",
+              "ssm:GetParameters"
+            ],
+            "Resource": [
+              "arn:aws:ssm:ap-northeast-2:*:parameter/springboot/*"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "ecsTaskRole": {
+    "roleName": "ecsTaskRole",
+    "assumeRolePolicyDocument": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Service": "ecs-tasks.amazonaws.com"
+          },
+          "Action": "sts:AssumeRole"
+        }
+      ]
+    },
+    "inlinePolicy": {
+      "policyName": "SpringBootTaskPolicy",
+      "policyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "logs:CreateLogStream",
+              "logs:PutLogEvents"
+            ],
+            "Resource": [
+              "arn:aws:logs:ap-northeast-2:*:log-group:/ecs/springboot-task:*"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

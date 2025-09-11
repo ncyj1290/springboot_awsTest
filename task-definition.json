@@ -1,0 +1,29 @@
+{
+  "family": "my-spring-app-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::305448253656:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "my-spring-app",
+      "image": "305448253656.dkr.ecr.ap-northeast-2.amazonaws.com/my-spring-app:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/my-spring-app-task",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

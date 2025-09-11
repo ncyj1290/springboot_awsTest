@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en"
+	  xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div layout:fragment="Content">
+		<h1>template/member/insert.html</h1>
+		<form action="/insertPro" method="post">
+			아이디 : <input type="text" name="id">
+			비밀번호 : <input type="password" name="password">
+			이름 : <input type="text" name="name">
+			<input type="submit" value="회원가입">
+		</form> 
+		
+	</div>
+</body>
+</html>
