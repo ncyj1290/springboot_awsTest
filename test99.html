@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Boot AWS 배포 테스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .status {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .info-box {
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .deployment-steps {
+            counter-reset: step-counter;
+        }
+        .deployment-steps li {
+            counter-increment: step-counter;
+            margin: 10px 0;
+            padding-left: 10px;
+        }
+        .deployment-steps li::marker {
+            content: "🚀 " counter(step-counter) ". ";
+            font-weight: bold;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Spring Boot AWS 배포 테스트</h1>
+        
+        <div class="status">
+            <strong>✅ 배포 상태:</strong> 성공적으로 AWS ECS에 배포 완료!
+        </div>
+        
+        <div class="info-box">
+            <h3>📊 프로젝트 정보</h3>
+            <ul>
+                <li><strong>프로젝트명:</strong> Spring Boot AWS Test</li>
+                <li><strong>배포 환경:</strong> AWS ECS Fargate</li>
+                <li><strong>CI/CD:</strong> GitHub Actions</li>
+                <li><strong>컨테이너 레지스트리:</strong> AWS ECR</li>
+                <li><strong>현재 접속 주소:</strong> <span class="highlight">http://43.203.161.249:8080</span></li>
+            </ul>
+        </div>
+
+        <h3>🔄 자동 배포 플로우</h3>
+        <ol class="deployment-steps">
+            <li>GitHub에 코드 푸시</li>
+            <li>GitHub Actions 워크플로우 자동 실행</li>
+            <li>Spring Boot 애플리케이션 빌드</li>
+            <li>Docker 이미지 생성</li>
+            <li>AWS ECR에 이미지 푸시</li>
+            <li>ECS 서비스 자동 업데이트</li>
+            <li>새 버전 배포 완료!</li>
+        </ol>
+
+        <div class="info-box">
+            <h3>🛠️ 기술 스택</h3>
+            <p>
+                <strong>Backend:</strong> Spring Boot 3.x, Java 21<br>
+                <strong>Container:</strong> Docker<br>
+                <strong>Cloud:</strong> AWS ECS, ECR<br>
+                <strong>CI/CD:</strong> GitHub Actions<br>
+                <strong>Network:</strong> VPC, Security Groups
+            </p>
+        </div>
+
+        <div class="info-box">
+            <h3>📅 배포 정보</h3>
+            <p>
+                <strong>배포 일시:</strong> 2025-09-11<br>
+                <strong>배포 방식:</strong> Blue-Green Deployment<br>
+                <strong>상태:</strong> <span style="color: green; font-weight: bold;">RUNNING</span><br>
+                <strong>인스턴스:</strong> Fargate (512 CPU, 1024 MB)
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>🤖 이 파일을 수정하고 커밋하면 자동으로 새 버전이 배포됩니다!</p>
+            <p><em>Generated with Claude Code - Auto Deployment Test</em></p>
+        </div>
+    </div>
+</body>
+</html>
