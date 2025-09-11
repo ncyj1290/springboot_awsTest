@@ -1,8 +1,14 @@
-<html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}"
+>
 	<head>
 		<title>index title</title>
 	</head>
 	<body>
-		<h1>template/index.html</h1>
+		<div layout:fragment="Content">
+			<h1>메인화면</h1>
+		</div>
 	</body>
 </html>
