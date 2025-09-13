@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}">
+
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE">사용자 목록</title>
+</head>
+
+<th:block layout:fragment="Content">
+    <div style="padding: 20px;">
+        <h2>👥 사용자 관리</h2>
+        
+        <!-- 검색 및 추가 버튼 영역 -->
+        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <input type="text" id="searchKeyword" placeholder="사용자명으로 검색..." style="padding: 8px; width: 200px;">
+                <button onclick="searchUsers()" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; cursor: pointer;">🔍 검색</button>
+                <button onclick="loadAllUsers()" style="padding: 8px 15px; background-color: #6c757d; color: white; border: none; cursor: pointer;">📋 전체목록</button>
+            </div>
+            <div>
+                <button onclick="location.href='/user/register'" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; cursor: pointer; font-weight: bold;">➕ 새 사용자 등록</button>
+            </div>
+        </div>
+
+        <!-- 사용자 목록 테이블 -->
+        <table id="userTable" style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+            <thead style="background-color: #f8f9fa;">
+                <tr>
+                    <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">ID</th>
+                    <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">사용자명</th>
+                    <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">이메일</th>
+                    <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">전화번호</th>
+                    <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">생성일</th>
+                    <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">관리</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <!-- 사용자 데이터가 여기에 동적으로 추가됩니다 -->
+            </tbody>
+        </table>
+
+        <!-- 로딩 및 메시지 영역 -->
+        <div id="loadingMessage" style="text-align: center; padding: 20px; display: none;">
+            ⏳ 데이터를 불러오는 중...
+        </div>
+        
+        <div id="noDataMessage" style="text-align: center; padding: 20px; color: #6c757d; display: none;">
+            📭 등록된 사용자가 없습니다.
+        </div>
+    </div>
+
+    <script>
+        // 페이지 로드시 전체 사용자 목록 조회
+        window.onload = function() {
+            loadAllUsers();
+        };
+
+        // 전체 사용자 목록 조회
+        function loadAllUsers() {
+            showLoading(true);
+            fetch('/api/users')
+                .then(response => response.json())
+                .then(data => {
+                    displayUsers(data);
+                    showLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('사용자 목록을 불러오는데 실패했습니다.');
+                    showLoading(false);
+                });
+        }
+
+        // 사용자 검색
+        function searchUsers() {
+            const keyword = document.getElementById('searchKeyword').value.trim();
+            if (!keyword) {
+                alert('검색어를 입력해주세요.');
+                return;
+            }
+
+            showLoading(true);
+            fetch(`/api/users/search?keyword=${encodeURIComponent(keyword)}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayUsers(data);
+                    showLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('검색에 실패했습니다.');
+                    showLoading(false);
+                });
+        }
+
+        // 사용자 목록 화면에 표시
+        function displayUsers(users) {
+            const tableBody = document.getElementById('userTableBody');
+            const noDataMessage = document.getElementById('noDataMessage');
+
+            if (users.length === 0) {
+                tableBody.innerHTML = '';
+                noDataMessage.style.display = 'block';
+                return;
+            }
+
+            noDataMessage.style.display = 'none';
+            
+            tableBody.innerHTML = users.map(user => `
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="border: 1px solid #ddd; padding: 10px;">${user.id}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px; font-weight: bold;">${user.username}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px;">${user.email}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px;">${user.phone || '-'}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px;">${formatDate(user.createdAt)}</td>
+                    <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">
+                        <button onclick="editUser(${user.id})" style="padding: 5px 10px; background-color: #ffc107; color: black; border: none; cursor: pointer; margin-right: 5px;">✏️ 수정</button>
+                        <button onclick="deleteUser(${user.id}, '${user.username}')" style="padding: 5px 10px; background-color: #dc3545; color: white; border: none; cursor: pointer;">🗑️ 삭제</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 사용자 수정 페이지로 이동
+        function editUser(userId) {
+            location.href = `/user/edit/${userId}`;
+        }
+
+        // 사용자 삭제
+        function deleteUser(userId, username) {
+            if (!confirm(`'${username}' 사용자를 정말 삭제하시겠습니까?`)) {
+                return;
+            }
+
+            fetch(`/api/users/${userId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('사용자가 성공적으로 삭제되었습니다.');
+                    loadAllUsers(); // 목록 새로고침
+                } else {
+                    alert('삭제에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('삭제 중 오류가 발생했습니다.');
+            });
+        }
+
+        // 로딩 상태 표시/숨김
+        function showLoading(show) {
+            const loadingMessage = document.getElementById('loadingMessage');
+            const userTable = document.getElementById('userTable');
+            
+            if (show) {
+                loadingMessage.style.display = 'block';
+                userTable.style.display = 'none';
+            } else {
+                loadingMessage.style.display = 'none';
+                userTable.style.display = 'table';
+            }
+        }
+
+        // 날짜 포맷팅
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ko-KR') + ' ' + date.toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit'});
+        }
+
+        // 검색 입력란에서 엔터키 처리
+        document.getElementById('searchKeyword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchUsers();
+            }
+        });
+    </script>
+</th:block>
+</html>

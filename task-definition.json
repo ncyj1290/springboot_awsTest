@@ -8,12 +8,34 @@
   "containerDefinitions": [
     {
       "name": "my-spring-app",
-      "image": "305448253656.dkr.ecr.ap-northeast-2.amazonaws.com/my-spring-app:latest",
+      "image": "305448253656.dkr.ecr.ap-northeast-2.amazonaws.com/my-springboot-app:latest",
       "essential": true,
       "portMappings": [
         {
           "containerPort": 8080,
           "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "DB_HOST",
+          "value": "my-springboot-db.crqya2um8g7x.ap-northeast-2.rds.amazonaws.com"
+        },
+        {
+          "name": "DB_PORT",
+          "value": "3306"
+        },
+        {
+          "name": "DB_NAME",
+          "value": "springdb"
+        },
+        {
+          "name": "DB_USER",
+          "value": "admin"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "value": "Test1234!"
         }
       ],
       "logConfiguration": {

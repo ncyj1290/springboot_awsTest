@@ -3,15 +3,25 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       th:fragment="HeaderFragment">
-    <div style="border: solid 1px">
+    <div style="border: solid 1px; padding: 15px; background-color: #f8f9fa;">
         <h1>Header 영역입니다.</h1>
         
-        <a th:href="@{test}">test</a>
-        <a th:href="@{test1}">test1</a>
-        <a th:href="@{test2}">test2</a>
-        <a th:href="@{test3}">test3</a>
-        <a th:href="@{insert}">insert</a>
-        <a th:href="@{login}">login</a>
+        <div style="margin-top: 10px;">
+            <!-- 기존 메뉴 -->
+            <a th:href="@{/test}" style="margin-right: 15px; text-decoration: none; color: #007bff;">test</a>
+            <a th:href="@{/test1}" style="margin-right: 15px; text-decoration: none; color: #007bff;">test1</a>
+            <a th:href="@{/test2}" style="margin-right: 15px; text-decoration: none; color: #007bff;">test2</a>
+            <a th:href="@{/test3}" style="margin-right: 15px; text-decoration: none; color: #007bff;">test3</a>
+            <a th:href="@{/insert}" style="margin-right: 15px; text-decoration: none; color: #007bff;">insert</a>
+            <a th:href="@{/login}" style="margin-right: 15px; text-decoration: none; color: #007bff;">login</a>
+            
+            <!-- 구분선 -->
+            <span style="margin: 0 10px; color: #6c757d;">|</span>
+            
+            <!-- 새로운 User 메뉴 -->
+            <a th:href="@{/user/list}" style="margin-right: 15px; text-decoration: none; color: #28a745; font-weight: bold;">👥 사용자 관리</a>
+            <a th:href="@{/user/register}" style="margin-right: 15px; text-decoration: none; color: #17a2b8;">➕ 사용자 등록</a>
+        </div>
         
     </div>
 </html>

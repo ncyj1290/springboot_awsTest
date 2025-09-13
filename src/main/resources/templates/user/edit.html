@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{common/layouts/defaultLayout}">
+
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE">사용자 수정</title>
+</head>
+
+<th:block layout:fragment="Content">
+    <div style="padding: 20px; max-width: 600px; margin: 0 auto;">
+        <h2>✏️ 사용자 정보 수정</h2>
+        
+        <!-- 사용자 정보 로딩 중 메시지 -->
+        <div id="loadingMessage" style="text-align: center; padding: 50px; display: block;">
+            ⏳ 사용자 정보를 불러오는 중...
+        </div>
+
+        <form id="userForm" style="background-color: #f8f9fa; padding: 30px; border-radius: 8px; border: 1px solid #ddd; display: none;">
+            
+            <!-- 사용자 ID (숨김) -->
+            <input type="hidden" id="userId" name="userId">
+            
+            <!-- 사용자 정보 표시 -->
+            <div style="background-color: #e9ecef; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                <p style="margin: 0; color: #6c757d;">
+                    <strong>사용자 ID:</strong> <span id="displayUserId"></span> | 
+                    <strong>등록일:</strong> <span id="displayCreatedAt"></span>
+                </p>
+            </div>
+
+            <!-- 사용자명 입력 -->
+            <div style="margin-bottom: 20px;">
+                <label for="username" style="display: block; margin-bottom: 5px; font-weight: bold;">👤 사용자명 *</label>
+                <input type="text" id="username" name="username" required
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;"
+                       placeholder="사용자명을 입력하세요">
+                <small style="color: #6c757d;">2-50자 이내, 영문/한글/숫자 가능</small>
+            </div>
+
+            <!-- 이메일 입력 -->
+            <div style="margin-bottom: 20px;">
+                <label for="email" style="display: block; margin-bottom: 5px; font-weight: bold;">📧 이메일 *</label>
+                <input type="email" id="email" name="email" required
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;"
+                       placeholder="이메일을 입력하세요">
+                <small style="color: #6c757d;">예: user@example.com</small>
+            </div>
+
+            <!-- 전화번호 입력 -->
+            <div style="margin-bottom: 30px;">
+                <label for="phone" style="display: block; margin-bottom: 5px; font-weight: bold;">📞 전화번호</label>
+                <input type="tel" id="phone" name="phone"
+                       style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;"
+                       placeholder="전화번호를 입력하세요 (선택사항)">
+                <small style="color: #6c757d;">예: 010-1234-5678</small>
+            </div>
+
+            <!-- 버튼 영역 -->
+            <div style="text-align: center;">
+                <button type="button" onclick="updateUser()" 
+                        style="padding: 12px 30px; background-color: #ffc107; color: black; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 10px;">
+                    ✅ 수정하기
+                </button>
+                <button type="button" onclick="location.href='/user/list'" 
+                        style="padding: 12px 30px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    ↩️ 목록으로
+                </button>
+            </div>
+        </form>
+
+        <!-- 에러 메시지 영역 -->
+        <div id="errorMessage" style="text-align: center; padding: 50px; color: #dc3545; display: none;">
+            ❌ 사용자 정보를 불러올 수 없습니다.
+            <br><br>
+            <button onclick="location.href='/user/list'" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                목록으로 돌아가기
+            </button>
+        </div>
+
+        <!-- 메시지 영역 -->
+        <div id="messageArea" style="margin-top: 20px; padding: 15px; border-radius: 4px; display: none;">
+        </div>
+    </div>
+
+    <script>
+        // 페이지 로드시 사용자 정보 조회
+        window.onload = function() {
+            const pathParts = window.location.pathname.split('/');
+            const userId = pathParts[pathParts.length - 1];
+            
+            if (!userId || isNaN(userId)) {
+                showError();
+                return;
+            }
+
+            loadUserInfo(userId);
+        };
+
+        // 사용자 정보 로드
+        function loadUserInfo(userId) {
+            fetch(`/api/users/${userId}`)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('사용자를 찾을 수 없습니다.');
+                    }
+                })
+                .then(user => {
+                    displayUserInfo(user);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError();
+                });
+        }
+
+        // 사용자 정보 화면에 표시
+        function displayUserInfo(user) {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('userForm').style.display = 'block';
+
+            // 폼에 데이터 설정
+            document.getElementById('userId').value = user.id;
+            document.getElementById('username').value = user.username;
+            document.getElementById('email').value = user.email;
+            document.getElementById('phone').value = user.phone || '';
+
+            // 정보 표시 영역
+            document.getElementById('displayUserId').textContent = user.id;
+            document.getElementById('displayCreatedAt').textContent = formatDate(user.createdAt);
+        }
+
+        // 사용자 정보 수정
+        function updateUser() {
+            const userId = document.getElementById('userId').value;
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            // 유효성 검사
+            if (!username) {
+                showMessage('사용자명을 입력해주세요.', 'error');
+                document.getElementById('username').focus();
+                return;
+            }
+
+            if (username.length < 2 || username.length > 50) {
+                showMessage('사용자명은 2-50자 이내로 입력해주세요.', 'error');
+                document.getElementById('username').focus();
+                return;
+            }
+
+            if (!email) {
+                showMessage('이메일을 입력해주세요.', 'error');
+                document.getElementById('email').focus();
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showMessage('올바른 이메일 형식을 입력해주세요.', 'error');
+                document.getElementById('email').focus();
+                return;
+            }
+
+            // 업데이트 데이터 준비
+            const updateData = {
+                username: username,
+                email: email,
+                phone: phone || null
+            };
+
+            // 서버에 전송
+            showMessage('수정 중...', 'info');
+            
+            fetch(`/api/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else if (response.status === 404) {
+                    throw new Error('사용자를 찾을 수 없습니다.');
+                } else if (response.status === 409) {
+                    throw new Error('이미 존재하는 사용자명 또는 이메일입니다.');
+                } else {
+                    throw new Error('수정에 실패했습니다.');
+                }
+            })
+            .then(data => {
+                showMessage(`✅ 사용자 '${data.username}'의 정보가 성공적으로 수정되었습니다!`, 'success');
+                
+                // 3초 후 목록 페이지로 이동
+                setTimeout(() => {
+                    location.href = '/user/list';
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('❌ ' + error.message, 'error');
+            });
+        }
+
+        // 에러 상태 표시
+        function showError() {
+            document.getElementById('loadingMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        // 메시지 표시 함수
+        function showMessage(message, type) {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.style.display = 'block';
+            messageArea.textContent = message;
+            
+            // 타입에 따른 스타일 적용
+            if (type === 'success') {
+                messageArea.style.backgroundColor = '#d4edda';
+                messageArea.style.color = '#155724';
+                messageArea.style.border = '1px solid #c3e6cb';
+            } else if (type === 'error') {
+                messageArea.style.backgroundColor = '#f8d7da';
+                messageArea.style.color = '#721c24';
+                messageArea.style.border = '1px solid #f5c6cb';
+            } else if (type === 'info') {
+                messageArea.style.backgroundColor = '#d1ecf1';
+                messageArea.style.color = '#0c5460';
+                messageArea.style.border = '1px solid #bee5eb';
+            }
+        }
+
+        // 이메일 유효성 검사
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // 날짜 포맷팅
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ko-KR') + ' ' + date.toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit'});
+        }
+
+        // 엔터키로 폼 제출
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+                e.preventDefault();
+                updateUser();
+            }
+        });
+
+        // 전화번호 입력 포맷팅 (선택사항)
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.getElementById('phone');
+            if (phoneInput) {
+                phoneInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/[^0-9]/g, '');
+                    if (value.length >= 3 && value.length <= 7) {
+                        value = value.replace(/(\d{3})(\d{1,4})/, '$1-$2');
+                    } else if (value.length >= 8) {
+                        value = value.replace(/(\d{3})(\d{4})(\d{1,4})/, '$1-$2-$3');
+                    }
+                    e.target.value = value;
+                });
+            }
+        });
+    </script>
+</th:block>
+</html>
